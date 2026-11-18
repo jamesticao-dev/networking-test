@@ -44,6 +44,7 @@ Step-by-step guide to how the prototype is built: [MULTIPLAYER_GUIDE.md](MULTIPL
 - [x] 2026-11-18: The camera no longer locks the cursor when clicking UI, such as the Fusion Menu gear and its panel.
 - [x] 2026-11-18: Voice chat added. Photon Voice for Fusion is installed; `VoiceRunnerSetup` and `PlayerVoice` added. `Player.prefab` gets a `Voice` child (`VoiceNetworkObject`, `Recorder`, `Speaker` with 3D audio, `PlayerVoice`) and a `SpeakingIndicator`. Talking is push-to-talk with V. Compiles cleanly; not yet tested in Play mode.
 - [x] 2026-11-18: Doc rule added. `CLAUDE.md` and `progress.md` both carry a full project-files list and must be updated with every change.
+- [x] 2026-11-18: Region fix so friends in different countries can join each other. Before, each player connected to their own "best region" (for example `asia` and `hk`), and sessions in one region can't be seen from another. `FixedRegion` in `PhotonAppSettings` is now `asia`, and `FusionMenuConnectionBehaviourSdk.CopyAppSettings` uses it whenever the menu passes no region. This is a vendor-file edit marked `PROJECT CHANGE`. Compiles cleanly; not yet tested with a friend.
 
 ## Next up
 
@@ -62,8 +63,11 @@ Step-by-step guide to how the prototype is built: [MULTIPLAYER_GUIDE.md](MULTIPL
 - Voice: the voice client must be on the runner's GameObject before players spawn. The runner is created at runtime, so `VoiceRunnerSetup.Ensure` is called from `NetworkBootstrap` and from `PlayerCapsule.Spawned`. If the runner has already started, its callbacks are registered with `AddCallbacks`.
 - Voice is proximity-based: 3D `AudioSource` with linear rolloff from 2 to 25 m.
 - **Build Multiplayer Scene** overwrites `Prototype.unity` and `Player.prefab`, so hand edits to them are lost. Use **Add Voice To Player Prefab** and **Setup Fusion Menu** for changes that shouldn't regenerate those files.
+- Region: every player uses one fixed Photon region (`asia`, from `PhotonAppSettings.FixedRegion`) instead of best region. The menu has no region picker (its region list is empty and it forces "best"), so falling back to the global `FixedRegion` was the smallest change. To change the region, edit `FixedRegion` in the `PhotonAppSettings` inspector, then rebuild.
 
 ## Open issues
 
+- Region fix not yet tested across two machines; the friend needs a new build. Both players should also use the same App Version in the menu's Settings, which defaults to a per-machine ID.
+- Re-importing the Fusion Menu package undoes the `PROJECT CHANGE` region fallback in `FusionMenuConnectionBehaviourSdk.cs`.
 - Not yet verified in Play mode: input on the menu-created runner (`ProvideInput` is switched on after `StartGame`), the host's own capsule spawning after the scene loads, and voice joining when `FusionVoiceClient` is added to an already-running runner.
 - The builder sets the prefab reference on the next Editor update (`delayCall`). If `NetworkBootstrap.playerPrefab` is empty after a rebuild, run **Tools → Prototype → Rewire Player Prefab**.

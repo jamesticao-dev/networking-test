@@ -214,6 +214,8 @@ FusionSampleMenu  ──(creates NetworkRunner + StartGame)──►  loads Prot
 
 > ⚠️ The menu switches to **Shared** mode if the *scene name* contains `Shared`. Keep "Shared" out of your gameplay scene's name.
 
+> 🌏 **Region:** Photon regions are separate servers, and a session in one region can't be seen from another. By default the menu picks each player's "best" region, so a player whose best region is `asia` and one whose best region is `hk` never meet. This project pins everyone to **`asia`** with `FixedRegion` in `Assets/Photon/Fusion/Resources/PhotonAppSettings.asset`, plus a small fallback in `FusionMenuConnectionBehaviourSdk.CopyAppSettings`. To change it, set `FixedRegion` in the inspector and send everyone a new build.
+
 You can still press Play directly in `Prototype.unity` for quick tests. It skips the menu and auto-joins session `proto`.
 
 ---
@@ -279,7 +281,7 @@ The console should print `[NetworkBootstrap] Started as Host` (or `Client`) and 
 | Both windows move the same capsule | Movement code isn't using `GetInput(...)` inside `FixedUpdateNetwork()`. |
 | Mouse doesn't turn the camera | Click inside the Game view first to lock the cursor. |
 | Can't connect at all | Check the App ID in Fusion Hub → Configuration and your internet connection. |
-| Players don't see each other | Both must use the **same session name** and the same Photon region. With the menu, both must Quick Play or use the same party code, with the same App Version and region in Settings. |
+| Players don't see each other | Both must use the **same session name** and the same Photon region. The region is pinned to `asia` (see Step 8), so both players must run a build made after that change. With the menu, both must Quick Play or use the same party code, with the same App Version in Settings (set both to `1.0`). |
 | No voice; console mentions AppId / authentication | Set **App Id Voice** (a separate Voice-type app) in Fusion Hub → Configuration. |
 | Voice connects but nobody hears you | Hold **V** while talking, or check your mic in Windows Sound settings. The Recorder uses the default input device. |
 | "No 'git' executable was found" when adding Voice | Install Git for Windows, then restart Unity and Unity Hub. |

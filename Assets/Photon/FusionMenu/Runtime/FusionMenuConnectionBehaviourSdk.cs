@@ -200,7 +200,13 @@ namespace FusionDemo {
     private FusionAppSettings CopyAppSettings(FusionMenuConnectArgs connectArgs) {
       FusionAppSettings appSettings = new FusionAppSettings();
       PhotonAppSettings.Global.AppSettings.CopyTo(appSettings);
-      appSettings.FixedRegion = _region = connectArgs.Region;
+      // PROJECT CHANGE (networking-test): the menu always passes an empty region ("best region"),
+      // which split players across regions (e.g. asia vs hk) so they could not find each other.
+      // Fall back to the FixedRegion in PhotonAppSettings so every player uses the same region.
+      // Re-apply this if the Fusion Menu package is re-imported.
+      appSettings.FixedRegion = _region = string.IsNullOrEmpty(connectArgs.Region)
+        ? PhotonAppSettings.Global.AppSettings.FixedRegion
+        : connectArgs.Region;
       appSettings.AppVersion = _appVersion = connectArgs.AppVersion;
       return appSettings;
     }

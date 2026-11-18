@@ -40,8 +40,9 @@ Don't finish a task with these out of date.
 
 - `Assets/Photon/` — vendor SDK (Fusion runtime/editor/codegen, Photon Realtime, PhotonLibs, NanoSockets native plugins). **Treat as read-only**; upgrades come from re-importing the SDK.
   - `Assets/Photon/Fusion/Resources/NetworkProjectConfig.fusion` — Fusion project config (JSON). Edited via the Unity inspector normally; `AssembliesToWeave` lists the assemblies Fusion IL-weaves (`Assembly-CSharp`, `Assembly-CSharp-firstpass`).
-  - `Assets/Photon/Fusion/Resources/PhotonAppSettings.asset` — holds the Photon App ID. Never print, commit to a public repo, or overwrite it.
+  - `Assets/Photon/Fusion/Resources/PhotonAppSettings.asset` — holds the Photon App ID. Never print, commit to a public repo, or overwrite it. Its `FixedRegion` is set to `asia` so all players meet in one region.
   - `Assets/Photon/FusionMenu/`: the imported Fusion Menu, with its own `Fusion.Menu` asmdef. Its connection logic is in `FusionMenuConnectionBehaviourSdk.cs`: it creates the runner, loads the chosen scene additively, and disables the menu camera once connected.
+    - **Project edit (exception to read-only):** `CopyAppSettings` falls back to `PhotonAppSettings.FixedRegion` when the menu passes an empty region. Without it, the menu always uses best region, and players in different countries end up in separate regions. It's marked `PROJECT CHANGE`; re-apply it after re-importing the menu.
   - `Assets/Photon/FusionDemos/*.unitypackage` (the Intro Shared sample) is not imported.
 - `Library/`, `Temp/`, `Logs/`, `UserSettings/`, `*.csproj`, `*.sln` — Unity-generated; never edit by hand.
 
