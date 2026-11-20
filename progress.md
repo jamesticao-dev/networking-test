@@ -3,7 +3,7 @@
 Running log of what's been done, what's in flight, and what's next for NetworkingTest.
 **Rule:** every new, moved or deleted file, and every new package, gets a dated **Done** entry and a row in **Project files**. See `CLAUDE.md` → "Keeping docs current".
 
-Step-by-step guide to how the prototype is built: [MULTIPLAYER_GUIDE.md](MULTIPLAYER_GUIDE.md).
+Beginner step-by-step guides: [MULTIPLAYER_GUIDE.md](MULTIPLAYER_GUIDE.md) (core multiplayer) and [VOICE_CHAT_GUIDE.md](VOICE_CHAT_GUIDE.md) (voice add-on).
 
 ## Current state (2026-11-18)
 
@@ -18,9 +18,11 @@ Step-by-step guide to how the prototype is built: [MULTIPLAYER_GUIDE.md](MULTIPL
 
 | File | Added | Purpose |
 |---|---|---|
+| `README.md` | 2026-11-18 | GitHub landing page: features, setup (clone, App IDs, play), controls, structure, troubleshooting. Rewritten 2026-11-20 |
 | `CLAUDE.md` | 2026-11-18 | Guidance for Claude Code: layout, architecture, commands, doc rules |
 | `progress.md` | 2026-11-18 | This log |
-| `MULTIPLAYER_GUIDE.md` | 2026-11-18 | Human step-by-step guide (setup, scripts, menu, voice, testing, troubleshooting) |
+| `MULTIPLAYER_GUIDE.md` | 2026-11-18 | Beginner guide to the core game: GameObjects, components and why, full scripts, scene, menu, testing (no voice) |
+| `VOICE_CHAT_GUIDE.md` | 2026-11-20 | Beginner add-on guide for Photon Voice: install, scripts, prefab wiring, testing |
 | `Assets/Scenes/Prototype.unity` | 2026-11-18 | Gameplay scene: ground, boxes, light, camera, `NetworkBootstrap`. The user moved it here from `_Project/Scenes` |
 | `Assets/Scenes/FusionSampleMenu.unity` | 2026-11-18 | Fusion Menu scene (from the Menu package via Fusion Hub) |
 | `Assets/_Project/Scripts/NetworkInputData.cs` | 2026-11-18 | Network input struct: move direction and Jump |
@@ -45,6 +47,10 @@ Step-by-step guide to how the prototype is built: [MULTIPLAYER_GUIDE.md](MULTIPL
 - [x] 2026-11-18: Voice chat added. Photon Voice for Fusion is installed; `VoiceRunnerSetup` and `PlayerVoice` added. `Player.prefab` gets a `Voice` child (`VoiceNetworkObject`, `Recorder`, `Speaker` with 3D audio, `PlayerVoice`) and a `SpeakingIndicator`. Talking is push-to-talk with V. Compiles cleanly; not yet tested in Play mode.
 - [x] 2026-11-18: Doc rule added. `CLAUDE.md` and `progress.md` both carry a full project-files list and must be updated with every change.
 - [x] 2026-11-18: Region fix so friends in different countries can join each other. Before, each player connected to their own "best region" (for example `asia` and `hk`), and sessions in one region can't be seen from another. `FixedRegion` in `PhotonAppSettings` is now `asia`, and `FusionMenuConnectionBehaviourSdk.CopyAppSettings` uses it whenever the menu passes no region. This is a vendor-file edit marked `PROJECT CHANGE`. Compiles cleanly; not yet tested with a friend.
+- [x] 2026-11-20: Guides rewritten for Unity beginners. `MULTIPLAYER_GUIDE.md` now gives, for each step, the GameObjects to make, the components to add and why, and the full scripts with how they connect. Voice moved out into the new `VOICE_CHAT_GUIDE.md`. The core guide shows `NetworkBootstrap` and `PlayerCapsule` without their `VoiceRunnerSetup.Ensure` lines, and the voice guide adds them back. Project code is unchanged.
+- [x] 2026-11-20: `MULTIPLAYER_GUIDE.md` Part 9.1 added. It explains how to configure the Fusion Menu: the `FusionMenuConfig.asset` fields (max players, app versions, available regions) and how to add or remove playable scenes with Scene Info assets in `Resources`.
+- [x] 2026-11-20: Tried making Party work with a chosen region. A second `PROJECT CHANGE` in `FusionMenuConnectionBehaviourSdk.RequestAvailableOnlineRegionsAsync` returned `FusionMenuConfig.AvailableRegions` instead of a forced "best" region. The user reverted it, so the file is back to the original. Docs updated to match.
+- [x] 2026-11-20: `README.md` rewritten as the GitHub landing page: what the project is, features, getting started (clone, open, set your own Fusion and Voice App IDs, play), controls, two-player testing, guide links, project structure, editor tools, troubleshooting, known limitations and credits.
 
 ## Next up
 
@@ -66,6 +72,10 @@ Step-by-step guide to how the prototype is built: [MULTIPLAYER_GUIDE.md](MULTIPL
 - Region: every player uses one fixed Photon region (`asia`, from `PhotonAppSettings.FixedRegion`) instead of best region. The menu has no region picker (its region list is empty and it forces "best"), so falling back to the global `FixedRegion` was the smallest change. To change the region, edit `FixedRegion` in the `PhotonAppSettings` inspector, then rebuild.
 
 ## Open issues
+
+- Choosing a region in the menu's Settings breaks Party create and join. `FusionMenuConnectionBehaviourSdk.RequestAvailableOnlineRegionsAsync` returns only the "best" (empty) region, so any other choice gives "Selected region is not available". That's why `FusionMenuConfig.AvailableRegions` stays empty; Part 9.1 of the guide documents this.
+
+- The guides embed full copies of the scripts. When a script changes, update its copy in `MULTIPLAYER_GUIDE.md` or `VOICE_CHAT_GUIDE.md` too.
 
 - Region fix not yet tested across two machines; the friend needs a new build. Both players should also use the same App Version in the menu's Settings, which defaults to a per-machine ID.
 - Re-importing the Fusion Menu package undoes the `PROJECT CHANGE` region fallback in `FusionMenuConnectionBehaviourSdk.cs`.

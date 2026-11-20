@@ -15,7 +15,7 @@ Every change that **adds, renames, moves or deletes a file**, adds a package, or
    - Keep the **Project files** table accurate (one row per project-made file).
    - Record any design choice under **Decisions / notes** and anything unverified under **Open issues**.
 2. **`CLAUDE.md`** (this file): update **Layout that matters** and the **Project files** list below when files, menus, packages or architecture change.
-3. **`MULTIPLAYER_GUIDE.md`**: update it when a change affects how a person builds, sets up or plays the game.
+3. **`MULTIPLAYER_GUIDE.md`** (core game) and **`VOICE_CHAT_GUIDE.md`** (voice add-on): update them when a change affects how a person builds, sets up or plays the game. Both embed full script copies (the core guide shows `NetworkBootstrap` and `PlayerCapsule` without the voice lines), so update those copies when a script changes.
 
 Don't finish a task with these out of date.
 
@@ -42,8 +42,8 @@ Don't finish a task with these out of date.
   - `Assets/Photon/Fusion/Resources/NetworkProjectConfig.fusion` — Fusion project config (JSON). Edited via the Unity inspector normally; `AssembliesToWeave` lists the assemblies Fusion IL-weaves (`Assembly-CSharp`, `Assembly-CSharp-firstpass`).
   - `Assets/Photon/Fusion/Resources/PhotonAppSettings.asset` — holds the Photon App ID. Never print, commit to a public repo, or overwrite it. Its `FixedRegion` is set to `asia` so all players meet in one region.
   - `Assets/Photon/FusionMenu/`: the imported Fusion Menu, with its own `Fusion.Menu` asmdef. Its connection logic is in `FusionMenuConnectionBehaviourSdk.cs`: it creates the runner, loads the chosen scene additively, and disables the menu camera once connected.
-    - **Project edit (exception to read-only):** `CopyAppSettings` falls back to `PhotonAppSettings.FixedRegion` when the menu passes an empty region. Without it, the menu always uses best region, and players in different countries end up in separate regions. It's marked `PROJECT CHANGE`; re-apply it after re-importing the menu.
-  - `Assets/Photon/FusionDemos/*.unitypackage` (the Intro Shared sample) is not imported.
+    - `FusionMenuConfig.asset` holds the menu options: max players, app versions and `AvailableRegions`. `AvailableRegions` is left empty, so everyone falls back to `FixedRegion`. Picking a region breaks Party, because `RequestAvailableOnlineRegionsAsync` only returns "best". Re-importing the menu resets this asset. Playable scenes are `FusionMenuSceneInfo` assets in any `Resources` folder.
+    - **Project edit (exception to read-only):** `CopyAppSettings` falls back to `PhotonAppSettings.FixedRegion` when the menu passes an empty region. Without it, the menu always uses best region, and players in different countries end up in separate regions. It's marked `PROJECT CHANGE`; re-apply it after re-importing the menu.  - `Assets/Photon/FusionDemos/*.unitypackage` (the Intro Shared sample) is not imported.
 - `Library/`, `Temp/`, `Logs/`, `UserSettings/`, `*.csproj`, `*.sln` — Unity-generated; never edit by hand.
 
 ## Project files
@@ -52,9 +52,11 @@ All files created for this project (Photon SDK files excluded):
 
 | File | Purpose |
 |---|---|
+| `README.md` | GitHub landing page: features, setup (clone, App IDs, play), controls, structure, troubleshooting |
 | `CLAUDE.md` | Guidance for Claude Code (this file) |
 | `progress.md` | Running log: done, next up, decisions, open issues, file table |
-| `MULTIPLAYER_GUIDE.md` | Step-by-step human guide to building the prototype |
+| `MULTIPLAYER_GUIDE.md` | Beginner guide to the core game: GameObjects, components, full scripts, scene, menu, testing |
+| `VOICE_CHAT_GUIDE.md` | Beginner add-on guide for voice chat (Photon Voice) |
 | `Assets/Scenes/FusionSampleMenu.unity` | Fusion Menu scene (from the Menu package, moved here); build index 0 |
 | `Assets/Scenes/Prototype.unity` | Capsule gameplay scene: ground, boxes, camera, `NetworkBootstrap`; build index 1 |
 | `Assets/_Project/Scripts/NetworkBootstrap.cs` | Attaches to the menu's runner or starts its own; spawns and despawns players; sends input |
